@@ -8,34 +8,35 @@
     
     <style>
         /* =========================================================
-           1. CORE STYLE & LAYOUT (TEMA HITAM EMAS KAKAK)
+           1. BASE THEME STYLE (HITAM EMAS LUXURY)
            ========================================================= */
         :root {
             --primary: #d4af37;
             --bg-dark: #0a0a0a;
             --card-bg: #121212;
             --border-gold: rgba(212,175,55,0.2);
+            --form-control-bg: #1a1a1a;
         }
+        
+        * { box-sizing: border-box; }
         body {
             font-family: 'Poppins', sans-serif;
             background-color: var(--bg-dark);
             color: #ffffff;
             margin: 0;
             padding: 12px;
-            box-sizing: border-box;
         }
         
-        /* Style pembungkus halaman utama */
         .admin-container {
             width: 100%;
-            max-width: 1200px;
+            max-width: 1250px;
             margin: 0 auto;
         }
 
-        /*Style Responsif Form Gudang Pindah ke Atas Khusus di HP*/
+        /* 📱 RESPONSIVE ENGINE FOR MOBILE (FORM AUTO DI ATAS) */
         .grid-gudang-split {
             display: flex;
-            flex-direction: column-reverse; /* Form naik ke atas di HP */
+            flex-direction: column-reverse; /* Membalik posisi: Form di atas, Tabel di bawah saat di HP */
             gap: 20px;
         }
 
@@ -47,36 +48,65 @@
             }
         }
 
+        /* CARD COMPONENT STANDARD */
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-gold);
+            padding: 20px;
+            border-radius: 8px;
+            width: 100%;
+        }
+
+        /* TABLE RESPONSIVE WRAPPER */
+        .table-responsive {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        /* FORM INPUT UTILITY */
+        .form-control {
+            width: 100%;
+            background: var(--form-control-bg);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: #fff;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .form-control:focus {
+            border-color: var(--primary);
+            outline: none;
+        }
+
         /* =========================================================
-           2. 🛠️ PERBAIKAN FOOTER COPYRIGHT (SUPER SLIM & RAMAH HP)
+           2. 🌟 COPYRIGHT FOOTER (SUPER SLIM & MINI UNTUK HP)
            ========================================================= */
         .footer-copyright {
             text-align: center;
-            padding: 10px 5px;       /* Dipangkas habis jaraknya biar tipis */
-            margin-top: 25px;        /* Jarak renggang dari card di atasnya diperkecil */
+            padding: 8px 5px;        /* Dipersempit biar super ramping */
+            margin-top: 20px;        /* Jarak renggang yang aman dari content */
             border-top: 1px solid rgba(212, 175, 55, 0.1);
             background: transparent;
             width: 100%;
-            box-sizing: border-box;
         }
 
         .footer-copyright p {
             margin: 0;
-            font-size: 11px;         /* Ukuran desktop diperkecil */
-            color: rgba(255, 255, 255, 0.5);
-            letter-spacing: 0.3px;
-            line-height: 1.4;
+            font-size: 11px;         /* Ukuran desktop */
+            color: rgba(255, 255, 255, 0.4);
+            letter-spacing: 0.5px;
+            line-height: 1.5;
         }
 
-        /* 📱 OPTIMASI UKURAN HURUF LEBIH KECIL KHUSUS DI HP */
         @media (max-width: 768px) {
             .footer-copyright {
-                padding: 6px 5px;    /* Makin ramping di layar HP */
-                margin-top: 15px;
+                padding: 4px 5px;    /* Ramping total di layar HP */
+                margin-top: 12px;
             }
             .footer-copyright p {
-                font-size: 9px;      /* Teks jadi imut, muat 1 baris murni tanpa menumpuk */
-                color: rgba(212, 175, 55, 0.4); /* Emas transparan super elegan */
+                font-size: 8.5px;    /* Tulisan imut, muat tanpa makan space */
+                color: rgba(212, 175, 55, 0.35); /* Warna emas samar yang elegan */
             }
         }
     </style>
@@ -84,6 +114,44 @@
 <body>
 
     <div class="admin-container">
+        
+        <div id="tabGudang" class="tab-content">
+            <div class="grid-gudang-split">
+                
+                <div class="card">
+                    <h3>🛠️ Stok Inventaris Rak Gudang Aktif</h3>
+                    <div class="table-responsive">
+                        <table style="width: 100%; min-width: 600px; border-collapse: collapse;">
+                            <thead>
+                                <tr>
+                                    <th>NAMA ALAT INVENTARIS</th>
+                                    <th>KATEGORI</th>
+                                    <th>STOK AKTIF</th>
+                                    <th>SATUAN</th>
+                                    <th>AKSI</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabelBarangBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="card" style="border: 1px solid var(--primary); height: fit-content;">
+                    <h3 style="color: var(--primary);">➕ Registrasi Item Alat Baru</h3>
+                    <div style="display: flex; flex-direction: column; gap: 12px;">
+                        <input type="text" id="addNama" class="form-control" placeholder="Nama Alat Baru...">
+                        <input type="text" id="addKategori" class="form-control" placeholder="Kategori...">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                            <input type="number" id="addStok" class="form-control" placeholder="Stok...">
+                            <input type="text" id="addSatuan" class="form-control" placeholder="Satuan...">
+                        </div>
+                        <input type="file" id="addGambarFile" accept="image/*">
+                        <button class="form-control" style="background: var(--primary); color:#000; font-weight:bold;" onclick="simpanBarangBaruKeCloud()">Daftarkan Ke Cloud</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
         <footer class="footer-copyright">
             <p>© 2026 SARPRAS STUDIO FOURCI. ALL RIGHTS RESERVED.<br>ENGINEERED WITH ENTERPRISE HIGH-PERFORMANCE CLOUD SYSTEM</p>
         </footer>
@@ -93,7 +161,6 @@
         // 🔗 PASTE LINK URL WEB APP GOOGLE APPS SCRIPT KAKAK DI SINI!
         const BASE_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwjKZkqppvAjHvc2anJryDbTWdfV2kYV2az4EoCybMLN8YmsuNvbr_T46VW3PDcELtZwg/exec";
 
-        // Sistem jembatan panggil fungsi cloud sheets
         async function panggilGoogleScript(fungsiName, parameterArray = []) {
             try {
                 let response = await fetch(BASE_WEB_APP_URL, {
@@ -104,29 +171,27 @@
                 });
                 return await response.json();
             } catch (error) {
-                console.error("Gagal koneksi ke Google Cloud: ", error);
+                console.error("Gagal terhubung ke Google API: ", error);
             }
         }
 
-        // Contoh cara panggil untuk memuat tabel dari github
-        async function muatDataGudangKeTabel() {
+        async function muatKatalogBarangGudang() {
             let data = await panggilGoogleScript("getStokAdmin");
-            if (!data) return;
-            
-            let tbody = document.getElementById("tabelBarangBody");
+            if(!data) return;
+
+            let tbody = document.getElementById("tabelBarangBody"); 
             if(!tbody) return;
             tbody.innerHTML = "";
-            
+
             data.forEach(row => {
                 let tr = document.createElement("tr");
-                tr.innerHTML = `<td>${row[0]}</td><td>${row[1]}</td><td>${row[2]}</td><td>${row[3]}</td>`;
+                tr.innerHTML = `<td><b>${row[0]}</b></td><td>${row[1]}</td><td>${row[2]}</td><td>${row[3]}</td><td><button>Edit</button></td>`; 
                 tbody.appendChild(tr);
             });
         }
 
         window.onload = function() {
-            // Jalankan fungsi load data otomatis saat github terbuka
-            muatDataGudangKeTabel();
+            muatKatalogBarangGudang();
         };
     </script>
 </body>
