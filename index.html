@@ -3,38 +3,97 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - Studio Fourci</title>
+    <title>Dashboard Admin - Studio Fourci</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     
     <style>
-        /* Taruh semua kode <style> bawaan Admin.html Kakak di sini */
+        /* =========================================================
+           1. CORE STYLE & LAYOUT (TEMA HITAM EMAS KAKAK)
+           ========================================================= */
         :root {
             --primary: #d4af37;
-            --border-gold: rgba(212,175,55,0.3);
-            /* ... Seterusnya sesuai style Admin.html Kakak ... */
+            --bg-dark: #0a0a0a;
+            --card-bg: #121212;
+            --border-gold: rgba(212,175,55,0.2);
         }
-        body { font-family: 'Poppins', sans-serif; background: #000; color: #fff; margin: 0; padding: 15px; }
-        /* Terapkan CSS responsive HP yang kemarin kita buat */
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-dark);
+            color: #ffffff;
+            margin: 0;
+            padding: 12px;
+            box-sizing: border-box;
+        }
+        
+        /* Style pembungkus halaman utama */
+        .admin-container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /*Style Responsif Form Gudang Pindah ke Atas Khusus di HP*/
+        .grid-gudang-split {
+            display: flex;
+            flex-direction: column-reverse; /* Form naik ke atas di HP */
+            gap: 20px;
+        }
+
         @media (min-width: 769px) {
-            #tabGudang .grid-gudang-split {
+            .grid-gudang-split {
                 display: grid !important;
                 grid-template-columns: 1.6fr 1fr !important;
                 flex-direction: row !important;
-                gap: 20px;
+            }
+        }
+
+        /* =========================================================
+           2. 🛠️ PERBAIKAN FOOTER COPYRIGHT (SUPER SLIM & RAMAH HP)
+           ========================================================= */
+        .footer-copyright {
+            text-align: center;
+            padding: 10px 5px;       /* Dipangkas habis jaraknya biar tipis */
+            margin-top: 25px;        /* Jarak renggang dari card di atasnya diperkecil */
+            border-top: 1px solid rgba(212, 175, 55, 0.1);
+            background: transparent;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .footer-copyright p {
+            margin: 0;
+            font-size: 11px;         /* Ukuran desktop diperkecil */
+            color: rgba(255, 255, 255, 0.5);
+            letter-spacing: 0.3px;
+            line-height: 1.4;
+        }
+
+        /* 📱 OPTIMASI UKURAN HURUF LEBIH KECIL KHUSUS DI HP */
+        @media (max-width: 768px) {
+            .footer-copyright {
+                padding: 6px 5px;    /* Makin ramping di layar HP */
+                margin-top: 15px;
+            }
+            .footer-copyright p {
+                font-size: 9px;      /* Teks jadi imut, muat 1 baris murni tanpa menumpuk */
+                color: rgba(212, 175, 55, 0.4); /* Emas transparan super elegan */
             }
         }
     </style>
 </head>
 <body>
 
-    <div id="tabGudang">
-        </div>
+    <div class="admin-container">
+        <footer class="footer-copyright">
+            <p>© 2026 SARPRAS STUDIO FOURCI. ALL RIGHTS RESERVED.<br>ENGINEERED WITH ENTERPRISE HIGH-PERFORMANCE CLOUD SYSTEM</p>
+        </footer>
+    </div>
 
     <script>
         // 🔗 PASTE LINK URL WEB APP GOOGLE APPS SCRIPT KAKAK DI SINI!
         const BASE_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwjKZkqppvAjHvc2anJryDbTWdfV2kYV2az4EoCybMLN8YmsuNvbr_T46VW3PDcELtZwg/exec";
 
-        // Fungsi pembantu untuk mengirim permintaan data ke Google Sheets via Fetch API
+        // Sistem jembatan panggil fungsi cloud sheets
         async function panggilGoogleScript(fungsiName, parameterArray = []) {
             try {
                 let response = await fetch(BASE_WEB_APP_URL, {
@@ -43,40 +102,31 @@
                     headers: { "Content-Type": "text/plain;charset=utf-8" },
                     body: JSON.stringify({ fungsi: fungsiName, args: parameterArray })
                 });
-                let hasil = await response.json();
-                return hasil;
+                return await response.json();
             } catch (error) {
-                console.error("Gagal koneksi ke Google Cloud API: ", error);
-                alert("Koneksi terputus, coba refresh halaman!");
+                console.error("Gagal koneksi ke Google Cloud: ", error);
             }
         }
 
-        // CONTOH PENYESUAIAN FUNGSI AMBIL DATA BARANG (PADA FRONTEND GITHUB)
-        async function muatKatalogBarangGudang() {
-            // Menggantikan google.script.run dengan Fetch API
+        // Contoh cara panggil untuk memuat tabel dari github
+        async function muatDataGudangKeTabel() {
             let data = await panggilGoogleScript("getStokAdmin");
-            if(!data) return;
-
-            let tbody = document.getElementById("tabelBarangBody"); 
+            if (!data) return;
+            
+            let tbody = document.getElementById("tabelBarangBody");
+            if(!tbody) return;
             tbody.innerHTML = "";
-            let daftarKategoriUnik = new Set();
-
+            
             data.forEach(row => {
-                let nama = row[0]; let kategori = row[1]; let stok = Number(row[2]); let satuan = row[3];
-                if(kategori) daftarKategoriUnik.add(kategori.trim());
-
                 let tr = document.createElement("tr");
-                tr.innerHTML = `<td><b>${nama}</b></td><td><span>${kategori}</span></td>...`; 
+                tr.innerHTML = `<td>${row[0]}</td><td>${row[1]}</td><td>${row[2]}</td><td>${row[3]}</td>`;
                 tbody.appendChild(tr);
             });
-            
-            perbaruiPilihanDropdownKategori(daftarKategoriUnik);
-            jalankanFilterGudangLive();
         }
 
-        // Jalankan fungsi otomatis saat halaman github pertama kali dibuka
         window.onload = function() {
-            muatKatalogBarangGudang();
+            // Jalankan fungsi load data otomatis saat github terbuka
+            muatDataGudangKeTabel();
         };
     </script>
 </body>
